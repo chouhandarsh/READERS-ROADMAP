@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readers Roadmap - AI-Powered Book Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --background: #f7fafc;
+            --surface: #ffffff;
+            --text-dark: #2d3748;
+            --text-medium: #4a5568;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+        }
+
+        html.dark {
+            --background: #1a202c;
+            --surface: #2d3748;
+            --text-dark: #f7fafc;
+            --text-medium: #a0aec0;
+            --text-light: #718096;
+            --border: #4a5568;
+        }
+
+        #homePage {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: opacity 0.7s ease-in-out;
+        }
+
+        .home-content {
+            background: rgba(0, 0, 0, 0.65);
+            padding: 50px 60px;
+            border-radius: var(--border-radius-lg);
+            color: white;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .home-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .home-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 500px;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #enterAppBtn {
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 14px 40px;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            background: var(--primary-gradient);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-xl);
+        }
+
+        #enterAppBtn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        #appContainer {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out;
+        }
+
+        .book-popover {
+            position: fixed;
+            background: var(--surface);
+            color: var(--text-dark);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-xl);
+            padding: 20px;
+            width: 320px;
+            z-index: 2000;
+            border: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(10px) scale(0.95);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            visibility: hidden;
+        }
+
+        .book-popover.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            visibility: visible;
+        }
+
+        .book-popover h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .book-popover p {
+            font-size: 0.9rem;
+            color: var(--text-medium);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .popover-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .popover-close:hover {
+            color: var(--text-dark);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: calc(100% + 15px);
+            right: 0;
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            width: 200px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            visibility: hidden;
+            z-index: 1100;
+        }
+
+        .profile-dropdown.active {
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+
+        .profile-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            color: var(--text-dark);
+        }
+
+        .profile-dropdown-item:hover {
+            background-color: var(--background);
+        }
+
+        .profile-dropdown-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            visibility: hidden;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .wishlist-modal {
+            background: var(--surface);
+            border-radius: var(--border-radius-lg);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .wishlist-modal {
+            transform: scale(1);
+        }
+
+        .wishlist-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wishlist-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .wishlist-body {
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .wishlist-item {
+            text-align: center;
+        }
+
+        .wishlist-item img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            margin-bottom: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .wishlist-item h5 {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .wishlist-empty {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        /* Styles for the new Login Modal (based on your existing .wishlist-modal) */
+        .login-modal {
+            background: var(--surface);
+            border-radius: var(--border-radius-lg);
+            width: 90%;
+            max-width: 450px;
+            /* Made it a bit smaller than the wishlist */
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .login-modal {
+            transform: scale(1);
+        }
+
+        .login-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .login-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .login-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            /* Copied styles from your .filter-input to ensure consistency */
+            padding: 10px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: var(--surface);
+            color: var(--text-dark);
+            width: 100%;
+        }
+
+        .form-input:focus {
+            /* Copied styles from your .filter-input:focus */
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-xl);
+        }
+
+        html.dark .header {
+            background: var(--surface);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo i {
+            font-size: 2.2rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 50px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--text-dark);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        html.dark .search-input {
+            background: rgba(74, 85, 104, 0.95);
+            color: var(--text-dark);
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: var(--surface);
+            box-shadow: var(--shadow-lg), 0 0 0 3px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-medium);
+            font-size: 1.1rem;
+        }
+
+        .user-profile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.2);
+            transition: .4s;
+            border-radius: 26px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "☀";
+            color: #f0c420;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #667eea;
+        }
+
+        input:checked+.slider:before {
+            content: "🌙";
+            color: #fff;
+            background-color: #2d3748;
+            transform: translateX(24px);
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .main-nav {
+            background: var(--surface);
+            padding: 0;
+            box-shadow: var(--shadow);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 2px;
+            background: var(--background);
+            padding: 8px;
+            border-radius: var(--border-radius-lg);
+            margin: 12px 0;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--surface);
+            color: var(--text-medium);
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: var(--shadow);
+            transform: translateY(-1px);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: var(--background);
+            color: var(--text-dark);
+            box-shadow: var(--shadow);
+            transform: translateY(-1px);
+        }
+
+        .filter-section {
+            background: var(--surface);
+            padding: 24px;
+            margin: 24px 0;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        .filter-select,
+        .filter-input {
+            padding: 10px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: var(--surface);
+            color: var(--text-dark);
+        }
+
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .mood-section {
+            display: none;
+            background: var(--surface);
+            padding: 24px;
+            margin: 24px 0;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+        }
+
+        .mood-section.active {
+            display: block;
+        }
+
+        .mood-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .mood-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mood-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .mood-card.selected {
+            border-color: #667eea;
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mood-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mood-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+            margin: 24px 0;
+        }
+
+        .content-area {
+            background: var(--surface);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            padding: 24px;
+        }
+
+        .book-card {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .book-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 400px;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .book-cover-fallback {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            width: 100%;
+            height: 100%;
+        }
+
+        .book-cover-fallback .fas {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .book-info {
+            padding: 20px;
+        }
+
+        .book-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 3.1em;
+        }
+
+        .book-author {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .book-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .rating-stars {
+            color: #fbbf24;
+        }
+
+        .rating-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-medium);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary.saved {
+            background: var(--secondary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .chatbot-sidebar {
+            background: var(--surface);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            position: sticky;
+            top: 100px;
+        }
+
+        .chat-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        }
+
+        html.dark .chat-header {
+            background: linear-gradient(135deg, #434343 0%, black 100%);
+        }
+
+        .chat-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .chat-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .message-bubble {
+            background: var(--background);
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            max-width: 250px;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .message.user .message-bubble {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        html.dark .message.user .message-bubble {
+            background: var(--primary-gradient);
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            resize: none;
+            background: var(--background);
+            color: var(--text-dark);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chat-send-btn {
+            padding: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .quick-action {
+            padding: 6px 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action:hover {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        html.dark .quick-action {
+            background: var(--background);
+        }
+
+        html.dark .quick-action:hover {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .loading {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: loading 1.4s ease-in-out infinite both;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes loading {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .chatbot-sidebar {
+                position: static;
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .search-container {
+                order: 1;
+                width: 100%;
+            }
+
+            .nav-tabs {
+                justify-content: flex-start;
+            }
+
+            .mood-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .books-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .home-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .home-content p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="homePage">
+        <div class="home-content">
+            <h1>Welcome to Readers Roadmap</h1>
+            <p>Your AI-powered guide to discovering your next favorite book. Find personalized recommendations, explore
+                genres, and build your ultimate reading list.</p>
+            <button id="enterAppBtn">Start Exploring &rarr;</button>
+        </div>
+    </div>
+
+    <div id="appContainer">
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo floating">
+                        <i class="fas fa-compass"></i>
+                        <span>Readers Roadmap</span>
+                    </div>
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="searchInput"
+                            placeholder="Search books, authors, genres...">
+                    </div>
+                    <div class="user-profile" id="userProfile">
+                        <label class="theme-switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider"></span>
+                        </label>
+                        <div class="profile-avatar" id="profileAvatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <div class="profile-dropdown-item" id="loginModalBtn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Login / Sign Up</span>
+                            </div>
+                            <div class="profile-dropdown-item" id="wishlistBtn">
+                                <i class="fas fa-heart"></i>
+                                <span>My Wishlist</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="main-nav">
+            <div class="container">
+                <div class="nav-container">
+                    <div class="nav-tabs">
+                        <button class="nav-tab active" data-tab="discover" data-section="books"><i
+                                class="fas fa-compass"></i> Discover Books</button>
+                        <button class="nav-tab" data-tab="mood" data-section="mood"><i class="fas fa-heart"></i> Search
+                            by Mood</button>
+                        <button class="nav-tab" data-tab="advanced" data-section="advanced"><i
+                                class="fas fa-sliders-h"></i> Advanced Filters</button>
+                        <button class="nav-tab" data-tab="trending" data-section="trending"><i class="fas fa-fire"></i>
+                            Trending</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="filter-section" id="booksFilters">
+                <div class="filter-grid">
+                    <div class="filter-group"><label class="filter-label">Genre</label><select class="filter-select"
+                            id="genreFilter">
+                            <option value="">All Genres</option>
+                            <option value="fantasy">Fantasy</option>
+                            <option value="romance">Romance</option>
+                            <option value="mystery">Mystery</option>
+                            <option value="science-fiction">Science Fiction</option>
+                            <option value="thriller">Thriller</option>
+                            <option value="biography">Biography</option>
+                            <option value="history">History</option>
+                            <option value="self-help">Self Help</option>
+                        </select></div>
+                    <div class="filter-group"><label class="filter-label">Rating</label><select class="filter-select"
+                            id="ratingFilter">
+                            <option value="">All Ratings</option>
+                            <option value="4.5">4.5+ Stars</option>
+                            <option value="4.0">4.0+ Stars</option>
+                            <option value="3.5">3.5+ Stars</option>
+                            <option value="3.0">3.0+ Stars</option>
+                        </select></div>
+                    <div class="filter-group"><label class="filter-label">Publication Year</label><select
+                            class="filter-select" id="yearFilter">
+                            <option value="">All Years</option>
+                            <option value="2020">2020+</option>
+                            <option value="2015">2015+</option>
+                            <option value="2010">2010+</option>
+                            <option value="2000">2000+</option>
+                        </select></div>
+                    <div class="filter-group"><label class="filter-label">Sort By</label><select class="filter-select"
+                            id="sortFilter">
+                            <option value="rating">Highest Rated</option>
+                            <option value="recent">Most Recent</option>
+                            <option value="popular">Most Popular</option>
+                            <option value="title">Title (A-Z)</option>
+                        </select></div>
+                </div>
+            </div>
+            <div class="mood-section" id="moodSection">
+                <h2 class="mood-title">How are you feeling today?</h2>
+                <div class="mood-grid">
+                    <div class="mood-card" data-mood="happy">
+                        <div class="mood-icon">😊</div>
+                        <div class="mood-name">Happy & Uplifting</div>
+                    </div>
+                    <div class="mood-card" data-mood="adventurous">
+                        <div class="mood-icon">🗺️</div>
+                        <div class="mood-name">Adventurous</div>
+                    </div>
+                    <div class="mood-card" data-mood="romantic">
+                        <div class="mood-icon">💕</div>
+                        <div class="mood-name">Romantic</div>
+                    </div>
+                    <div class="mood-card" data-mood="mysterious">
+                        <div class="mood-icon">🔍</div>
+                        <div class="mood-name">Mysterious</div>
+                    </div>
+                    <div class="mood-card" data-mood="thoughtful">
+                        <div class="mood-icon">🤔</div>
+                        <div class="mood-name">Thoughtful</div>
+                    </div>
+                    <div class="mood-card" data-mood="escape">
+                        <div class="mood-icon">🌟</div>
+                        <div class="mood-name">Need to Escape</div>
+                    </div>
+                    <div class="mood-card" data-mood="inspiring">
+                        <div class="mood-icon">💪</div>
+                        <div class="mood-name">Inspiring</div>
+                    </div>
+                    <div class="mood-card" data-mood="cozy">
+                        <div class="mood-icon">☕</div>
+                        <div class="mood-name">Cozy & Comforting</div>
+                    </div>
+                </div>
+            </div>
+            <div class="main-content">
+                <div class="content-area">
+                    <div class="books-grid" id="booksGrid"></div>
+                </div>
+                <aside class="chatbot-sidebar">
+                    <div class="chat-header">
+                        <h3><i class="fas fa-robot"></i> AI Book Assistant</h3>
+                        <p>Get personalized book recommendations!</p>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-bubble">
+                                👋 Hi! I'm your AI book assistant. I can help you discover amazing books!
+                                <div class="quick-actions">
+                                    <span class="quick-action"
+                                        onclick="sendQuickMessage('Recommend a fantasy book')">Fantasy books</span>
+                                    <span class="quick-action"
+                                        onclick="sendQuickMessage('Books for relaxation')">Relaxing reads</span>
+                                    <span class="quick-action"
+                                        onclick="sendQuickMessage('Popular books this year')">Popular 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <div class="chat-input-group">
+                            <textarea class="chat-input" id="chatInput" placeholder="Ask me about books..."
+                                rows="1"></textarea>
+                            <button class="chat-send-btn" id="chatSendBtn"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="wishlistModalOverlay">
+        <div class="wishlist-modal">
+            <div class="wishlist-header">
+                <h2><i class="fas fa-heart"></i> My Wishlist</h2>
+                <button class="popover-close" id="closeWishlistBtn">&times;</button>
+            </div>
+            <div class="wishlist-body" id="wishlistBody"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loginModalOverlay">
+        <div class="login-modal">
+            <div class="login-header">
+                <h2><i class="fas fa-user-plus"></i> Add Account</h2>
+                <button class="popover-close" id="closeLoginBtn">&times;</button>
+            </div>
+            <div class="login-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email ID</label>
+                        <input type="email" id="email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="form-input" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; margin-top: 1rem; font-size: 1rem; padding: 12px;">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const BOOKS_DATA = [
+            { "id": 1, "title": "Harry Potter and the Half-Blood Prince", "author": "J.K. Rowling", "genre": "fantasy", "rating": 4.57, "year": 2006, "cover": "https://covers.openlibrary.org/b/isbn/9780439785969-L.jpg", "description": "The sixth book in the Harry Potter series follows Harry's sixth year at Hogwarts.", "mood": ["adventurous", "escape"] },
+            { "id": 2, "title": "Harry Potter and the Order of the Phoenix", "author": "J.K. Rowling", "genre": "fantasy", "rating": 4.49, "year": 2004, "cover": "https://covers.openlibrary.org/b/isbn/9780439358071-L.jpg", "description": "Harry's fifth year at Hogwarts brings new challenges and the formation of Dumbledore's Army.", "mood": ["adventurous", "escape"] },
+            { "id": 77, "title": "The Hating Game", "author": "Sally Thorne", "genre": "romance", "rating": 4.13, "year": 2016, "cover": "https://covers.openlibrary.org/b/isbn/9780062439598-L.jpg", "description": "A workplace enemies-to-lovers romance full of wit and chemistry.", "mood": ["romantic", "happy"] },
+            { "id": 78, "title": "It Ends with Us", "author": "Colleen Hoover", "genre": "romance", "rating": 4.29, "year": 2016, "cover": "https://covers.openlibrary.org/b/isbn/9781501110368-L.jpg", "description": "A powerful story about love, strength, and making difficult choices.", "mood": ["romantic", "thoughtful"] },
+            { "id": 200, "title": "The Name of the Wind", "author": "Patrick Rothfuss", "genre": "fantasy", "rating": 4.55, "year": 2007, "cover": "https://covers.openlibrary.org/b/isbn/9780756404079-L.jpg", "description": "The tale of Kvothe, a legendary figure who tells his own story.", "mood": ["adventurous", "escape"] },
+            { "id": 201, "title": "Mistborn: The Final Empire", "author": "Brandon Sanderson", "genre": "fantasy", "rating": 4.45, "year": 2006, "cover": "https://covers.openlibrary.org/b/isbn/9780765311788-L.jpg", "description": "A heist story set in a world where ash falls from the sky and mist dominates the night.", "mood": ["adventurous", "escape", "mysterious"] },
+            { "id": 202, "title": "The Way of Kings", "author": "Brandon Sanderson", "genre": "fantasy", "rating": 4.65, "year": 2010, "cover": "https://covers.openlibrary.org/b/isbn/9780765326355-L.jpg", "description": "Epic fantasy featuring knights radiant and magical swords called shardblades.", "mood": ["adventurous", "escape", "inspiring"] },
+            { "id": 203, "title": "A Wizard of Earthsea", "author": "Ursula K. Le Guin", "genre": "fantasy", "rating": 4.01, "year": 1968, "cover": "https://covers.openlibrary.org/b/isbn/9780547722023-L.jpg", "description": "The coming-of-age story of a young wizard named Ged.", "mood": ["adventurous", "thoughtful"] },
+            { "id": 204, "title": "The Fifth Season", "author": "N.K. Jemisin", "genre": "fantasy", "rating": 4.31, "year": 2015, "cover": "https://covers.openlibrary.org/b/isbn/9780316229296-L.jpg", "description": "In a world of constant catastrophe, a woman searches for her daughter.", "mood": ["escape", "mysterious", "thoughtful"] },
+            { "id": 205, "title": "The Lies of Locke Lamora", "author": "Scott Lynch", "genre": "fantasy", "rating": 4.30, "year": 2006, "cover": "https://covers.openlibrary.org/b/isbn/9780553588941-L.jpg", "description": "A tale of thievery, adventure, and con artistry in a fantasy Venice.", "mood": ["adventurous", "mysterious"] },
+            { "id": 206, "title": "Elantris", "author": "Brandon Sanderson", "genre": "fantasy", "rating": 4.05, "year": 2005, "cover": "https://covers.openlibrary.org/b/isbn/9780765350374-L.jpg", "description": "A standalone fantasy about a fallen magical city and its cursed inhabitants.", "mood": ["escape", "mysterious"] },
+            { "id": 207, "title": "The Poppy War", "author": "R.F. Kuang", "genre": "fantasy", "rating": 4.16, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9780062662569-L.jpg", "description": "A dark military fantasy inspired by Chinese history.", "mood": ["adventurous", "thoughtful"] },
+            { "id": 208, "title": "Gardens of the Moon", "author": "Steven Erikson", "genre": "fantasy", "rating": 3.88, "year": 1999, "cover": "https://covers.openlibrary.org/b/isbn/9780765348784-L.jpg", "description": "First book of the Malazan series, an epic tale of war and intrigue.", "mood": ["adventurous", "escape"] },
+            { "id": 209, "title": "The Night Circus", "author": "Erin Morgenstern", "genre": "fantasy", "rating": 3.99, "year": 2011, "cover": "https://covers.openlibrary.org/b/isbn/9780307744432-L.jpg", "description": "A magical competition between two young illusionists set in a mysterious circus.", "mood": ["romantic", "escape", "cozy"] },
+            { "id": 300, "title": "Pride and Prejudice", "author": "Jane Austen", "genre": "romance", "rating": 4.27, "year": 1813, "cover": "https://covers.openlibrary.org/b/isbn/9780141439518-L.jpg", "description": "A classic tale of love, misunderstanding, and social class in Regency England.", "mood": ["romantic", "cozy"] },
+            { "id": 301, "title": "Beach Read", "author": "Emily Henry", "genre": "romance", "rating": 3.96, "year": 2020, "cover": "https://covers.openlibrary.org/b/isbn/9781984806734-L.jpg", "description": "Two writers with opposite styles challenge each other to write in different genres.", "mood": ["romantic", "happy", "cozy"] },
+            { "id": 302, "title": "The Time Traveler's Wife", "author": "Audrey Niffenegger", "genre": "romance", "rating": 3.98, "year": 2003, "cover": "https://covers.openlibrary.org/b/isbn/9780156029438-L.jpg", "description": "A love story complicated by involuntary time travel.", "mood": ["romantic", "thoughtful"] },
+            { "id": 303, "title": "People We Meet on Vacation", "author": "Emily Henry", "genre": "romance", "rating": 4.10, "year": 2021, "cover": "https://covers.openlibrary.org/b/isbn/9781984806758-L.jpg", "description": "Two best friends take annual vacations together until one summer changes everything.", "mood": ["romantic", "happy"] },
+            { "id": 304, "title": "The Bride Test", "author": "Helen Hoang", "genre": "romance", "rating": 4.22, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9780451490827-L.jpg", "description": "A Vietnamese woman travels to America with the mission to win a man's heart.", "mood": ["romantic", "happy"] },
+            { "id": 305, "title": "The Unhoneymooners", "author": "Christina Lauren", "genre": "romance", "rating": 3.98, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9781501128035-L.jpg", "description": "Enemies forced to pretend to be newlyweds on a honeymoon in Hawaii.", "mood": ["romantic", "happy"] },
+            { "id": 306, "title": "From Blood and Ash", "author": "Jennifer L. Armentrout", "genre": "romance", "rating": 4.28, "year": 2020, "cover": "https://covers.openlibrary.org/b/isbn/9781952457005-L.jpg", "description": "A maiden's duty, a forbidden love, and a dangerous destiny collide.", "mood": ["romantic", "adventurous", "escape"] },
+            { "id": 307, "title": "The Duke and I", "author": "Julia Quinn", "genre": "romance", "rating": 3.91, "year": 2000, "cover": "https://covers.openlibrary.org/b/isbn/9780380800827-L.jpg", "description": "A fake courtship between a duke and a young woman leads to real feelings.", "mood": ["romantic", "happy"] },
+            { "id": 308, "title": "The Flatshare", "author": "Beth O'Leary", "genre": "romance", "rating": 4.06, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9781787474413-L.jpg", "description": "Two people share an apartment but have never met, communicating through notes.", "mood": ["romantic", "cozy", "happy"] },
+            { "id": 309, "title": "The Wedding Date", "author": "Jasmine Guillory", "genre": "romance", "rating": 3.75, "year": 2018, "cover": "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1515694525i/33815781.jpg", "description": "A fake wedding date turns into something real.", "mood": ["romantic", "happy"] },
+            { "id": 400, "title": "The Da Vinci Code", "author": "Dan Brown", "genre": "mystery", "rating": 3.89, "year": 2003, "cover": "https://covers.openlibrary.org/b/isbn/9780385504201-L.jpg", "description": "A symbologist uncovers a conspiracy involving the Catholic Church.", "mood": ["mysterious", "adventurous"] },
+            { "id": 401, "title": "Gone Girl", "author": "Gillian Flynn", "genre": "mystery", "rating": 4.05, "year": 2012, "cover": "https://covers.openlibrary.org/b/isbn/9780307588371-L.jpg", "description": "A wife's disappearance becomes a twisted tale of marriage and deception.", "mood": ["mysterious", "thoughtful"] },
+            { "id": 402, "title": "The Girl with the Dragon Tattoo", "author": "Stieg Larsson", "genre": "mystery", "rating": 4.14, "year": 2005, "cover": "https://covers.openlibrary.org/b/isbn/9780307454546-L.jpg", "description": "A journalist and a hacker investigate a decades-old disappearance.", "mood": ["mysterious", "adventurous"] },
+            { "id": 403, "title": "Big Little Lies", "author": "Liane Moriarty", "genre": "mystery", "rating": 4.20, "year": 2014, "cover": "https://covers.openlibrary.org/b/isbn/9780399167065-L.jpg", "description": "Three women's seemingly perfect lives unravel with deadly consequences.", "mood": ["mysterious", "thoughtful"] },
+            { "id": 404, "title": "The Silent Patient", "author": "Alex Michaelides", "genre": "mystery", "rating": 4.07, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9781250301697-L.jpg", "description": "A woman shoots her husband and then never speaks another word.", "mood": ["mysterious"] },
+            { "id": 405, "title": "In the Woods", "author": "Tana French", "genre": "mystery", "rating": 3.93, "year": 2007, "cover": "https://covers.openlibrary.org/b/isbn/9780143113492-L.jpg", "description": "A detective investigates a murder that echoes a tragedy from his own past.", "mood": ["mysterious", "thoughtful"] },
+            { "id": 406, "title": "The Cuckoo's Calling", "author": "Robert Galbraith", "genre": "mystery", "rating": 4.00, "year": 2013, "cover": "https://covers.openlibrary.org/b/isbn/9780316206846-L.jpg", "description": "A private detective investigates the death of a supermodel.", "mood": ["mysterious"] },
+            { "id": 407, "title": "The Seven Deaths of Evelyn Hardcastle", "author": "Stuart Turton", "genre": "mystery", "rating": 4.06, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9781492657965-L.jpg", "description": "A murder mystery where the protagonist relives the same day in different bodies.", "mood": ["mysterious", "escape"] },
+            { "id": 408, "title": "And Then There Were None", "author": "Agatha Christie", "genre": "mystery", "rating": 4.27, "year": 1939, "cover": "https://covers.openlibrary.org/b/isbn/9780062073488-L.jpg", "description": "Ten strangers are lured to an island where they're killed off one by one.", "mood": ["mysterious"] },
+            { "id": 409, "title": "The Woman in the Window", "author": "A.J. Finn", "genre": "mystery", "rating": 3.77, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9780062678416-L.jpg", "description": "An agoraphobic woman witnesses something shocking across the street.", "mood": ["mysterious"] },
+            { "id": 500, "title": "Dune", "author": "Frank Herbert", "genre": "science-fiction", "rating": 4.25, "year": 1965, "cover": "https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg", "description": "A noble family becomes embroiled in a war for control of the desert planet Arrakis.", "mood": ["adventurous", "escape", "thoughtful"] },
+            { "id": 501, "title": "Ender's Game", "author": "Orson Scott Card", "genre": "science-fiction", "rating": 4.30, "year": 1985, "cover": "https://covers.openlibrary.org/b/isbn/9780812550702-L.jpg", "description": "A brilliant child is trained in military strategy to save Earth from alien invasion.", "mood": ["adventurous", "thoughtful"] },
+            { "id": 502, "title": "The Martian", "author": "Andy Weir", "genre": "science-fiction", "rating": 4.40, "year": 2011, "cover": "https://covers.openlibrary.org/b/isbn/9780553418026-L.jpg", "description": "An astronaut stranded on Mars must use his ingenuity to survive.", "mood": ["adventurous", "inspiring"] },
+            { "id": 503, "title": "Foundation", "author": "Isaac Asimov", "genre": "science-fiction", "rating": 4.13, "year": 1951, "cover": "https://covers.openlibrary.org/b/isbn/9780553293357-L.jpg", "description": "A mathematician develops a science to predict the future of humanity.", "mood": ["escape", "thoughtful"] },
+            { "id": 504, "title": "Neuromancer", "author": "William Gibson", "genre": "science-fiction", "rating": 3.89, "year": 1984, "cover": "https://covers.openlibrary.org/b/isbn/9780441569595-L.jpg", "description": "A washed-up hacker is hired for one last job in cyberspace.", "mood": ["escape", "mysterious"] },
+            { "id": 505, "title": "Snow Crash", "author": "Neal Stephenson", "genre": "science-fiction", "rating": 4.02, "year": 1992, "cover": "https://covers.openlibrary.org/b/isbn/9780553380958-L.jpg", "description": "A pizza delivery driver moonlights as a hacker in a virtual reality world.", "mood": ["adventurous", "escape"] },
+            { "id": 506, "title": "The Left Hand of Darkness", "author": "Ursula K. Le Guin", "genre": "science-fiction", "rating": 4.08, "year": 1969, "cover": "https://covers.openlibrary.org/b/isbn/9780441478125-L.jpg", "description": "A human envoy visits a planet where inhabitants can change gender.", "mood": ["thoughtful", "escape"] },
+            { "id": 507, "title": "Project Hail Mary", "author": "Andy Weir", "genre": "science-fiction", "rating": 4.52, "year": 2021, "cover": "https://covers.openlibrary.org/b/isbn/9780593135204-L.jpg", "description": "A lone astronaut must save Earth from an extinction-level threat.", "mood": ["adventurous", "inspiring", "happy"] },
+            { "id": 508, "title": "Hyperion", "author": "Dan Simmons", "genre": "science-fiction", "rating": 4.21, "year": 1989, "cover": "https://covers.openlibrary.org/b/isbn/9780553283686-L.jpg", "description": "Seven pilgrims journey to meet the Shrike, a creature of time and death.", "mood": ["escape", "thoughtful", "mysterious"] },
+            { "id": 509, "title": "Ready Player One", "author": "Ernest Cline", "genre": "science-fiction", "rating": 4.26, "year": 2011, "cover": "https://covers.openlibrary.org/b/isbn/9780307887436-L.jpg", "description": "A virtual treasure hunt in a dystopian future filled with 1980s pop culture.", "mood": ["adventurous", "escape", "happy"] },
+            { "id": 600, "title": "The Girl on the Train", "author": "Paula Hawkins", "genre": "thriller", "rating": 3.95, "year": 2015, "cover": "https://covers.openlibrary.org/b/isbn/9781594633669-L.jpg", "description": "A woman becomes entangled in a missing person investigation.", "mood": ["mysterious"] },
+            { "id": 601, "title": "The Hunt for Red October", "author": "Tom Clancy", "genre": "thriller", "rating": 4.23, "year": 1984, "cover": "https://covers.openlibrary.org/b/isbn/9780425240335-L.jpg", "description": "A Soviet submarine captain defects to the United States.", "mood": ["adventurous"] },
+            { "id": 602, "title": "The Bourne Identity", "author": "Robert Ludlum", "genre": "thriller", "rating": 4.18, "year": 1980, "cover": "https://covers.openlibrary.org/b/isbn/9780553593549-L.jpg", "description": "An amnesiac assassin tries to discover his identity while being hunted.", "mood": ["adventurous", "mysterious"] },
+            { "id": 603, "title": "Sharp Objects", "author": "Gillian Flynn", "genre": "thriller", "rating": 4.03, "year": 2006, "cover": "https://covers.openlibrary.org/b/isbn/9780307341556-L.jpg", "description": "A reporter returns to her hometown to cover the murders of two girls.", "mood": ["mysterious"] },
+            { "id": 604, "title": "The Silence of the Lambs", "author": "Thomas Harris", "genre": "thriller", "rating": 4.19, "year": 1988, "cover": "https://covers.openlibrary.org/b/isbn/9780312924584-L.jpg", "description": "An FBI trainee seeks the help of an imprisoned cannibal to catch a serial killer.", "mood": ["mysterious"] },
+            { "id": 605, "title": "Dark Places", "author": "Gillian Flynn", "genre": "thriller", "rating": 4.07, "year": 2009, "cover": "https://covers.openlibrary.org/b/isbn/9780307341563-L.jpg", "description": "A woman confronts the traumatic events of her childhood when her family was murdered.", "mood": ["mysterious"] },
+            { "id": 606, "title": "The Woman in Cabin 10", "author": "Ruth Ware", "genre": "thriller", "rating": 3.69, "year": 2016, "cover": "https://covers.openlibrary.org/b/isbn/9781501132933-L.jpg", "description": "A journalist on a luxury cruise witnesses a murder, but no one believes her.", "mood": ["mysterious"] },
+            { "id": 607, "title": "Behind Closed Doors", "author": "B.A. Paris", "genre": "thriller", "rating": 3.90, "year": 2016, "cover": "https://covers.openlibrary.org/b/isbn/9781250121004-L.jpg", "description": "A seemingly perfect marriage hides a terrifying secret.", "mood": ["mysterious"] },
+            { "id": 608, "title": "The Guest List", "author": "Lucy Foley", "genre": "thriller", "rating": 3.95, "year": 2020, "cover": "https://covers.openlibrary.org/b/isbn/9780062868930-L.jpg", "description": "A wedding celebration on a remote island turns deadly.", "mood": ["mysterious"] },
+            { "id": 609, "title": "Before I Go to Sleep", "author": "S.J. Watson", "genre": "thriller", "rating": 3.76, "year": 2011, "cover": "https://covers.openlibrary.org/b/isbn/9780062060556-L.jpg", "description": "A woman wakes up every day with no memory of her past.", "mood": ["mysterious"] },
+            { "id": 700, "title": "Becoming", "author": "Michelle Obama", "genre": "biography", "rating": 4.53, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg", "description": "The memoir of the former First Lady of the United States.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 701, "title": "Educated", "author": "Tara Westover", "genre": "biography", "rating": 4.49, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9780399590504-L.jpg", "description": "A woman's quest for knowledge despite growing up in an isolated survivalist family.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 702, "title": "The Diary of a Young Girl", "author": "Anne Frank", "genre": "biography", "rating": 4.16, "year": 1947, "cover": "https://covers.openlibrary.org/b/isbn/9780553296983-L.jpg", "description": "The powerful diary of a Jewish girl hiding from the Nazis during World War II.", "mood": ["thoughtful"] },
+            { "id": 703, "title": "Steve Jobs", "author": "Walter Isaacson", "genre": "biography", "rating": 4.13, "year": 2011, "cover": "https://covers.openlibrary.org/b/isbn/9781451648539-L.jpg", "description": "The authorized biography of the Apple co-founder.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 704, "title": "Born a Crime", "author": "Trevor Noah", "genre": "biography", "rating": 4.46, "year": 2016, "cover": "https://covers.openlibrary.org/b/isbn/9780399588174-L.jpg", "description": "Stories from a South African childhood during apartheid.", "mood": ["inspiring", "happy"] },
+            { "id": 705, "title": "The Glass Castle", "author": "Jeannette Walls", "genre": "biography", "rating": 4.28, "year": 2005, "cover": "https://covers.openlibrary.org/b/isbn/9780743247542-L.jpg", "description": "A memoir of resilience and redemption amid an unconventional upbringing.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 706, "title": "Into the Wild", "author": "Jon Krakauer", "genre": "biography", "rating": 3.99, "year": 1996, "cover": "https://covers.openlibrary.org/b/isbn/9780385486804-L.jpg", "description": "The story of Christopher McCandless who gave up everything to live in the Alaskan wilderness.", "mood": ["adventurous", "thoughtful"] },
+            { "id": 707, "title": "Long Walk to Freedom", "author": "Nelson Mandela", "genre": "biography", "rating": 4.32, "year": 1994, "cover": "https://covers.openlibrary.org/b/isbn/9780316548182-L.jpg", "description": "The autobiography of South Africa's first Black president.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 708, "title": "I Am Malala", "author": "Malala Yousafzai", "genre": "biography", "rating": 4.12, "year": 2013, "cover": "https://covers.openlibrary.org/b/isbn/9780316322409-L.jpg", "description": "The story of a Pakistani girl who stood up for education and was shot by the Taliban.", "mood": ["inspiring"] },
+            { "id": 709, "title": "Unbroken", "author": "Laura Hillenbrand", "genre": "biography", "rating": 4.39, "year": 2010, "cover": "https://covers.openlibrary.org/b/isbn/9781400064168-L.jpg", "description": "The incredible true story of survival and resilience of an Olympic runner and WWII veteran.", "mood": ["inspiring", "adventurous"] },
+            { "id": 800, "title": "Atomic Habits", "author": "James Clear", "genre": "self-help", "rating": 4.37, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg", "description": "A guide to building good habits and breaking bad ones.", "mood": ["inspiring"] },
+            { "id": 801, "title": "The 7 Habits of Highly Effective People", "author": "Stephen R. Covey", "genre": "self-help", "rating": 4.11, "year": 1989, "cover": "https://covers.openlibrary.org/b/isbn/9780743269513-L.jpg", "description": "Principles for personal and professional effectiveness.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 802, "title": "How to Win Friends and Influence People", "author": "Dale Carnegie", "genre": "self-help", "rating": 4.21, "year": 1936, "cover": "https://covers.openlibrary.org/b/isbn/9780671027032-L.jpg", "description": "Timeless advice on building relationships and influencing others.", "mood": ["inspiring"] },
+            { "id": 803, "title": "The Subtle Art of Not Giving a F*ck", "author": "Mark Manson", "genre": "self-help", "rating": 3.95, "year": 2016, "cover": "https://covers.openlibrary.org/b/isbn/9780062457714-L.jpg", "description": "A counterintuitive approach to living a good life.", "mood": ["inspiring", "happy"] },
+            { "id": 804, "title": "Daring Greatly", "author": "Brené Brown", "genre": "self-help", "rating": 4.21, "year": 2012, "cover": "https://covers.openlibrary.org/b/isbn/9781592408412-L.jpg", "description": "How the courage to be vulnerable transforms our lives.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 805, "title": "The Power of Now", "author": "Eckhart Tolle", "genre": "self-help", "rating": 4.13, "year": 1997, "cover": "https://covers.openlibrary.org/b/isbn/9781577314806-L.jpg", "description": "A guide to spiritual enlightenment and living in the present moment.", "mood": ["thoughtful", "cozy"] },
+            { "id": 806, "title": "Mindset", "author": "Carol S. Dweck", "genre": "self-help", "rating": 4.11, "year": 2006, "cover": "https://covers.openlibrary.org/b/isbn/9780345472328-L.jpg", "description": "The psychology of success and the power of a growth mindset.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 807, "title": "Can't Hurt Me", "author": "David Goggins", "genre": "self-help", "rating": 4.41, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9781544512273-L.jpg", "description": "A former Navy SEAL shares his secrets to mental toughness.", "mood": ["inspiring"] },
+            { "id": 808, "title": "The Four Agreements", "author": "Don Miguel Ruiz", "genre": "self-help", "rating": 4.18, "year": 1997, "cover": "https://covers.openlibrary.org/b/isbn/9781878424310-L.jpg", "description": "Ancient Toltec wisdom for personal freedom.", "mood": ["thoughtful", "inspiring"] },
+            { "id": 809, "title": "You Are a Badass", "author": "Jen Sincero", "genre": "self-help", "rating": 3.93, "year": 2013, "cover": "https://covers.openlibrary.org/b/isbn/9780762447695-L.jpg", "description": "How to stop doubting your greatness and start living an awesome life.", "mood": ["inspiring", "happy"] },
+
+            // --- 20 New Science-Fiction Books ---
+            { "id": 900, "title": "1984", "author": "George Orwell", "genre": "science-fiction", "rating": 4.19, "year": 1949, "cover": "https://covers.openlibrary.org/b/isbn/9780451524935-L.jpg", "description": "A dystopian novel set in a totalitarian society under constant surveillance.", "mood": ["thoughtful", "mysterious", "escape"] },
+            { "id": 901, "title": "Brave New World", "author": "Aldous Huxley", "genre": "science-fiction", "rating": 3.99, "year": 1932, "cover": "https://covers.openlibrary.org/b/isbn/9780060850524-L.jpg", "description": "A dystopian novel about a future society genetically engineered into intelligence-based castes.", "mood": ["thoughtful", "escape"] },
+            { "id": 902, "title": "Fahrenheit 451", "author": "Ray Bradbury", "genre": "science-fiction", "rating": 3.97, "year": 1953, "cover": "https://covers.openlibrary.org/b/isbn/9781451673319-L.jpg", "description": "A future American society where books are banned and 'firemen' burn any that are found.", "mood": ["thoughtful", "mysterious"] },
+            { "id": 903, "title": "The Hitchhiker's Guide to the Galaxy", "author": "Douglas Adams", "genre": "science-fiction", "rating": 4.22, "year": 1979, "cover": "https://covers.openlibrary.org/b/isbn/9780345391803-L.jpg", "description": "A comedy sci-fi series following the last surviving man from Earth on his adventures through space.", "mood": ["happy", "adventurous", "escape"] },
+            { "id": 904, "title": "Frankenstein", "author": "Mary Shelley", "genre": "science-fiction", "rating": 3.84, "year": 1818, "cover": "https://covers.openlibrary.org/b/isbn/9780486282114-L.jpg", "description": "A young scientist creates a sapient creature in an unorthodox scientific experiment.", "mood": ["thoughtful", "mysterious"] },
+            { "id": 905, "title": "Slaughterhouse-Five", "author": "Kurt Vonnegut", "genre": "science-fiction", "rating": 4.08, "year": 1969, "cover": "https://covers.openlibrary.org/b/isbn/9780385333849-L.jpg", "description": "An anti-war novel about the firebombing of Dresden, featuring time travel and aliens.", "mood": ["thoughtful", "escape"] },
+            { "id": 906, "title": "The Handmaid's Tale", "author": "Margaret Atwood", "genre": "science-fiction", "rating": 4.12, "year": 1985, "cover": "https://covers.openlibrary.org/b/isbn/9780385490818-L.jpg", "description": "A dystopian novel set in a patriarchal, totalitarian state known as Gilead.", "mood": ["thoughtful", "mysterious"] },
+            { "id": 907, "title": "The War of the Worlds", "author": "H.G. Wells", "genre": "science-fiction", "rating": 3.83, "year": 1898, "cover": "https://covers.openlibrary.org/b/isbn/9781440471131-L.jpg", "description": "One of the earliest stories to detail a conflict between mankind and an extraterrestrial race.", "mood": ["adventurous", "escape"] },
+            { "id": 908, "title": "The Time Machine", "author": "H.G. Wells", "genre": "science-fiction", "rating": 3.90, "year": 1895, "cover": "https://covers.openlibrary.org/b/isbn/9780451530709-L.jpg", "description": "A scientist invents a time machine and travels to the distant future, only to find humanity has split into two species.", "mood": ["adventurous", "thoughtful", "escape"] },
+            { "id": 909, "title": "I, Robot", "author": "Isaac Asimov", "genre": "science-fiction", "rating": 4.21, "year": 1950, "cover": "https://covers.openlibrary.org/b/isbn/9780553294385-L.jpg", "description": "A collection of short stories about the Three Laws of Robotics and their effect on human-robot interaction.", "mood": ["thoughtful", "mysterious"] },
+            { "id": 910, "title": "Do Androids Dream of Electric Sheep?", "author": "Philip K. Dick", "genre": "science-fiction", "rating": 4.09, "year": 1968, "cover": "https://covers.openlibrary.org/b/isbn/9780345404473-L.jpg", "description": "A bounty hunter, Rick Deckard, hunts renegade androids in a post-apocalyptic San Francisco.", "mood": ["mysterious", "thoughtful", "escape"] },
+            { "id": 911, "title": "The Three-Body Problem", "author": "Cixin Liu", "genre": "science-fiction", "rating": 4.06, "year": 2008, "cover": "https://covers.openlibrary.org/b/isbn/9780765377067-L.jpg", "description": "A secret military project in China sends signals into space, contacting a doomed alien civilization.", "mood": ["mysterious", "thoughtful", "escape"] },
+            { "id": 912, "title": "Children of Time", "author": "Adrian Tchaikovsky", "genre": "science-fiction", "rating": 4.32, "year": 2015, "cover": "https://covers.openlibrary.org/b/isbn/9780316452506-L.jpg", "description": "Humanity's last survivors discover a terraformed planet, but it's not uninhabited.", "mood": ["adventurous", "thoughtful", "escape"] },
+            { "id": 913, "title": "The Road", "author": "Cormac McCarthy", "genre": "science-fiction", "rating": 3.97, "year": 2006, "cover": "https://covers.openlibrary.org/b/isbn/9780307387899-L.jpg", "description": "A father and son walk through a post-apocalyptic America, seeking survival.", "mood": ["thoughtful", "mysterious"] },
+            { "id": 914, "title": "Annihilation", "author": "Jeff VanderMeer", "genre": "science-fiction", "rating": 3.69, "year": 2014, "cover": "https://covers.openlibrary.org/b/isbn/9780374104092-L.jpg", "description": "A team of female scientists enters 'Area X', an unexplained phenomenon that is cut off from the world.", "mood": ["mysterious", "escape", "thoughtful"] },
+            { "id": 915, "title": "Klara and the Sun", "author": "Kazuo Ishiguro", "genre": "science-fiction", "rating": 3.90, "year": 2021, "cover": "https://covers.openlibrary.org/b/isbn/9780571364879-L.jpg", "description": "The story of Klara, an 'Artificial Friend' with outstanding observational qualities, who watches the world.", "mood": ["thoughtful", "cozy"] },
+            { "id": 916, "title": "Exhalation", "author": "Ted Chiang", "genre": "science-fiction", "rating": 4.43, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9781101947883-L.jpg", "description": "A collection of mind-bending short stories exploring technology, humanity, and alternate realities.", "mood": ["thoughtful", "inspiring"] },
+            { "id": 917, "title": "A Clockwork Orange", "author": "Anthony Burgess", "genre": "science-fiction", "rating": 3.99, "year": 1962, "cover": "https://covers.openlibrary.org/b/isbn/9780393312836-L.jpg", "description": "A dystopian satire on youth violence and state rehabilitation programs.", "mood": ["thoughtful", "mysterious"] },
+            { "id": 918, "title": "The Blazing World", "author": "Margaret Cavendish", "genre": "science-fiction", "rating": 3.47, "year": 1666, "cover": "https://covers.openlibrary.org/b/isbn/9780140433722-L.jpg", "description": "One of the earliest examples of sci-fi, a utopian work about a woman who enters a new world.", "mood": ["adventurous", "escape", "thoughtful"] },
+            { "id": 919, "title": "Contact", "author": "Carl Sagan", "genre": "science-fiction", "rating": 4.14, "year": 1985, "cover": "https://covers.openlibrary.org/b/isbn/9780671004102-L.jpg", "description": "A scientist, after years of searching, finds conclusive radio proof of extraterrestrial intelligence.", "mood": ["thoughtful", "inspiring", "mysterious"] },
+
+            // --- 20 New History Books ---
+            { "id": 1000, "title": "Sapiens: A Brief History of Humankind", "author": "Yuval Noah Harari", "genre": "history", "rating": 4.39, "year": 2011, "cover": "https://covers.openlibrary.org/b/isbn/9780062316097-L.jpg", "description": "A sweeping overview of the entire history of human beings, from the Stone Age to the present.", "mood": ["thoughtful", "inspiring"] },
+            { "id": 1001, "title": "Guns, Germs, and Steel", "author": "Jared Diamond", "genre": "history", "rating": 4.02, "year": 1997, "cover": "https://covers.openlibrary.org/b/isbn/9780393317558-L.jpg", "description": "An exploration of why Eurasian and North African civilizations have survived and conquered others.", "mood": ["thoughtful"] },
+            { "id": 1002, "title": "The Rise and Fall of the Third Reich", "author": "William L. Shirer", "genre": "history", "rating": 4.36, "year": 1960, "cover": "https://covers.openlibrary.org/b/isbn/9780671728687-L.jpg", "description": "A comprehensive historical account of Nazi Germany from its origins to its defeat in WWII.", "mood": ["thoughtful"] },
+            { "id": 1003, "title": "A People's History of the United States", "author": "Howard Zinn", "genre": "history", "rating": 4.06, "year": 1980, "cover": "https://covers.openlibrary.org/b/isbn/9780060838652-L.jpg", "description": "American history told from the perspective of common people rather than political elites.", "mood": ["thoughtful", "inspiring"] },
+            { "id": 1004, "title": "1491: New Revelations of the Americas Before Columbus", "author": "Charles C. Mann", "genre": "history", "rating": 4.04, "year": 2005, "cover": "https://covers.openlibrary.org/b/isbn/9781400032051-L.jpg", "description": "A detailed look at the civilizations that existed in the Americas before the arrival of Europeans.", "mood": ["thoughtful", "mysterious"] },
+            { "id": 1005, "title": "SPQR: A History of Ancient Rome", "author": "Mary Beard", "genre": "history", "rating": 4.16, "year": 2015, "cover": "https://covers.openlibrary.org/b/isbn/9780871404237-L.jpg", "description": "A fresh perspective on the history of Rome, its rise, its culture, and its people.", "mood": ["thoughtful"] },
+            { "id": 1006, "title": "Endurance: Shackleton's Incredible Voyage", "author": "Alfred Lansing", "genre": "history", "rating": 4.42, "year": 1959, "cover": "https://covers.openlibrary.org/b/isbn/9780465062881-L.jpg", "description": "The true story of Ernest Shackleton's harrowing expedition to the Antarctic in 1914.", "mood": ["adventurous", "inspiring"] },
+            { "id": 1007, "title": "The Guns of August", "author": "Barbara W. Tuchman", "genre": "history", "rating": 4.19, "year": 1962, "cover": "https://covers.openlibrary.org/b/isbn/9780345476098-L.jpg", "description": "A detailed account of the first month of World War I, leading up to the great conflagration.", "mood": ["thoughtful"] },
+            { "id": 1008, "title": "Killers of the Flower Moon", "author": "David Grann", "genre": "history", "rating": 4.28, "year": 2017, "cover": "https://covers.openlibrary.org/b/isbn/9780385534246-L.jpg", "description": "The true story of the Osage Nation murders in the 1920s and the birth of the FBI.", "mood": ["mysterious", "thoughtful"] },
+            { "id": 1009, "title": "Rubicon: The Last Years of the Roman Republic", "author": "Tom Holland", "genre": "history", "rating": 4.15, "year": 2003, "cover": "https://covers.openlibrary.org/b/isbn/9781400078974-L.jpg", "description": "A vivid historical account of the collapse of the Roman Republic and the rise of the Empire.", "mood": ["thoughtful"] },
+            { "id": 1010, "title": "Stalingrad", "author": "Antony Beevor", "genre": "history", "rating": 4.32, "year": 1998, "cover": "https://covers.openlibrary.org/b/isbn/9780140249859-L.jpg", "description": "A gripping and brutal account of the pivotal WWII battle from both the German and Soviet perspectives.", "mood": ["thoughtful"] },
+            { "id": 1011, "title": "The Wright Brothers", "author": "David McCullough", "genre": "history", "rating": 4.21, "year": 2015, "cover": "https://covers.openlibrary.org/b/isbn/9781476728742-L.jpg", "description": "The inspiring story of two bicycle mechanics from Ohio who changed the world with the first flight.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 1012, "title": "Team of Rivals", "author": "Doris Kearns Goodwin", "genre": "history", "rating": 4.38, "year": 2005, "cover": "https://covers.openlibrary.org/b/isbn/9780684824901-L.jpg", "description": "A biographical portrait of Abraham Lincoln and his cabinet, whom he brought together from his political rivals.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 1013, "title": "The Second World War", "author": "Antony Beevor", "genre": "history", "rating": 4.33, "year": 2012, "cover": "https://covers.openlibrary.org/b/isbn/9780316023740-L.jpg", "description": "A single-volume history of the Second World War, covering all fronts in a comprehensive narrative.", "mood": ["thoughtful"] },
+            { "id": 1014, "title": "The Emperor of All Maladies: A Biography of Cancer", "author": "Siddhartha Mukherjee", "genre": "history", "rating": 4.32, "year": 2010, "cover": "https://covers.openlibrary.org/b/isbn/9781439107959-L.jpg", "description": "A 'biography' of cancer, from its first documented appearances thousands of years ago to modern-day battles.", "mood": ["thoughtful", "inspiring"] },
+            { "id": 1015, "title": "Bad Blood: Secrets and Lies in a Silicon Valley Startup", "author": "John Carreyrou", "genre": "history", "rating": 4.34, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9781524731656-L.jpg", "description": "The true story of the rise and shocking collapse of Theranos, the multibillion-dollar biotech startup.", "mood": ["mysterious", "thoughtful"] },
+            { "id": 1016, "title": "The Gulag Archipelago", "author": "Aleksandr Solzhenitsyn", "genre": "history", "rating": 4.45, "year": 1973, "cover": "https://covers.openlibrary.org/b/isbn/9780060803322-L.jpg", "description": "An exhaustive account of the Soviet prison camp system, based on the author's own experiences.", "mood": ["thoughtful"] },
+            { "id": 1017, "title": "Over the Edge of the World", "author": "Laurence Bergreen", "genre": "history", "rating": 4.07, "year": 2003, "cover": "https://covers.openlibrary.org/b/isbn/9780060936389-L.jpg", "description": "The incredible story of Ferdinand Magellan's circumnavigation of the globe.", "mood": ["adventurous", "inspiring"] },
+            { "id": 1018, "title": "The History of the Peloponnesian War", "author": "Thucydides", "genre": "history", "rating": 3.95, "year": -411, "cover": "https://covers.openlibrary.org/b/isbn/9780140440393-L.jpg", "description": "The foundational text of political realism, this is a contemporary account of the war between Athens and Sparta.", "mood": ["thoughtful"] },
+            { "id": 1019, "title": "Genghis Khan and the Making of the Modern World", "author": "Jack Weatherford", "genre": "history", "rating": 4.19, "year": 2004, "cover": "https://covers.openlibrary.org/b/isbn/9780609809648-L.jpg", "description": "A history of the Mongol Empire and its surprisingly modern and progressive influence.", "mood": ["adventurous", "thoughtful", "inspiring"] },
+
+            // --- START OF 39 NEW BOOKS TO "TOP UP" MOODS TO 20+ ---
+            // 11 for "happy"
+            { "id": 1020, "title": "Eleanor Oliphant Is Completely Fine", "author": "Gail Honeyman", "genre": "romance", "rating": 4.26, "year": 2017, "cover": "https://covers.openlibrary.org/b/isbn/9780735220683-L.jpg", "description": "A quirky and lonely woman's life changes when she and a coworker save an elderly man.", "mood": ["happy", "thoughtful", "inspiring"] },
+            { "id": 1021, "title": "Less", "author": "Andrew Sean Greer", "genre": "romance", "rating": 3.74, "year": 2017, "cover": "https://covers.openlibrary.org/b/isbn/9780316316125-L.jpg", "description": "A failed novelist travels the world to avoid his ex-boyfriend's wedding. A Pulitzer Prize winner.", "mood": ["happy", "thoughtful"] },
+            { "id": 1022, "title": "Me Talk Pretty One Day", "author": "David Sedaris", "genre": "biography", "rating": 4.10, "year": 2000, "cover": "https://covers.openlibrary.org/b/isbn/9780316776967-L.jpg", "description": "A hilarious collection of autobiographical essays, including his move to Paris to learn French.", "mood": ["happy", "inspiring"] },
+            { "id": 1023, "title": "A Man Called Ove", "author": "Fredrik Backman", "genre": "romance", "rating": 4.36, "year": 2012, "cover": "https://covers.openlibrary.org/b/isbn/9781476738017-L.jpg", "description": "A grumpy widower's solitary world is upended when a boisterous young family moves in next door.", "mood": ["happy", "thoughtful", "cozy"] },
+            { "id": 1024, "title": "Where'd You Go, Bernadette", "author": "Maria Semple", "genre": "mystery", "rating": 3.93, "year": 2012, "cover": "https://covers.openlibrary.org/b/isbn/9780316204279-L.jpg", "description": "A brilliant but reclusive architect disappears, leaving her 15-year-old daughter to piece together the clues.", "mood": ["happy", "mysterious", "thoughtful"] },
+            { "id": 1025, "title": "The Rosie Project", "author": "Graeme Simsion", "genre": "romance", "rating": 4.03, "year": 2013, "cover": "https://covers.openlibrary.org/b/isbn/9781476729084-L.jpg", "description": "A genetics professor with Asperger's creates a questionnaire to find the perfect wife.", "mood": ["happy", "romantic"] },
+            { "id": 1026, "title": "Good Omens", "author": "Neil Gaiman & Terry Pratchett", "genre": "fantasy", "rating": 4.26, "year": 1990, "cover": "https://covers.openlibrary.org/b/isbn/9780060853976-L.jpg", "description": "An angel and a demon team up to prevent the Apocalypse, having grown fond of Earth.", "mood": ["happy", "escape", "adventurous"] },
+            { "id": 1027, "title": "Bridget Jones's Diary", "author": "Helen Fielding", "genre": "romance", "rating": 3.78, "year": 1996, "cover": "https://covers.openlibrary.org/b/isbn/9780140280097-L.jpg", "description": "A comedic and relatable diary of a single woman in her thirties navigating life and love in London.", "mood": ["happy", "romantic", "cozy"] },
+            { "id": 1028, "title": "The Princess Bride", "author": "William Goldman", "genre": "fantasy", "rating": 4.26, "year": 1973, "cover": "https://covers.openlibrary.org/b/isbn/9780156035217-L.jpg", "description": "A classic tale of true love, high adventure, pirates, giants, and, of course, a beautiful princess.", "mood": ["happy", "adventurous", "romantic", "escape"] },
+            { "id": 1029, "title": "Hyperbole and a Half", "author": "Allie Brosh", "genre": "biography", "rating": 4.36, "year": 2013, "cover": "https://covers.openlibrary.org/b/isbn/9781451666175-L.jpg", "description": "Hilarious and poignant illustrated essays about depression, dogs, and everyday life.", "mood": ["happy", "thoughtful"] },
+            { "id": 1030, "title": "Let's Pretend This Never Happened", "author": "Jenny Lawson", "genre": "biography", "rating": 4.02, "year": 2012, "cover": "https://covers.openlibrary.org/b/isbn/9780425261019-L.jpg", "description": "A hysterically funny memoir about a bizarre childhood in rural Texas and an equally strange adult life.", "mood": ["happy"] },
+
+            // 3 for "adventurous"
+            { "id": 1031, "title": "The Three Musketeers", "author": "Alexandre Dumas", "genre": "history", "rating": 4.07, "year": 1844, "cover": "https://covers.openlibrary.org/b/isbn/9780140440256-L.jpg", "description": "A young man named d'Artagnan joins the King's Musketeers and befriends Athos, Porthos, and Aramis.", "mood": ["adventurous", "inspiring"] },
+            { "id": 1032, "title": "The Call of the Wild", "author": "Jack London", "genre": "fantasy", "rating": 3.93, "year": 1903, "cover": "https://covers.openlibrary.org/b/isbn/9780486264721-L.jpg", "description": "A domesticated dog, Buck, is stolen and sold into the brutal life of an Alaskan sled dog.", "mood": ["adventurous", "thoughtful"] },
+            { "id": 1033, "title": "Treasure Island", "author": "Robert Louis Stevenson", "genre": "fantasy", "rating": 3.84, "year": 1883, "cover": "https://covers.openlibrary.org/b/isbn/9780486275598-L.jpg", "description": "A classic tale of pirates, buried gold, and adventure on the high seas.", "mood": ["adventurous", "escape", "mysterious"] },
+
+            // 9 for "romantic"
+            { "id": 1034, "title": "Red, White & Royal Blue", "author": "Casey McQuiston", "genre": "romance", "rating": 4.15, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9781250316776-L.jpg", "description": "The First Son of the United States and a British prince fall in love, causing a media frenzy.", "mood": ["romantic", "happy"] },
+            { "id": 1035, "title": "The Notebook", "author": "Nicholas Sparks", "genre": "romance", "rating": 4.11, "year": 1996, "cover": "https://covers.openlibrary.org/b/isbn/9780446605236-L.jpg", "description": "An elderly man reads a story from his notebook to a woman in a nursing home, detailing their lifelong love.", "mood": ["romantic", "thoughtful"] },
+            { "id": 1036, "title": "Outlander", "author": "Diana Gabaldon", "genre": "romance", "rating": 4.24, "year": 1991, "cover": "https://covers.openlibrary.org/b/isbn/9780440212560-L.jpg", "description": "A former WWII nurse is transported back in time from 1945 to 1743 Scotland, where she finds adventure and love.", "mood": ["romantic", "adventurous", "escape", "history"] },
+            { "id": 1037, "title": "The Kiss Quotient", "author": "Helen Hoang", "genre": "romance", "rating": 3.93, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9780451490803-L.jpg", "description": "A woman with Asperger's who excels at math hires a male escort to teach her about love.", "mood": ["romantic", "happy", "cozy"] },
+            { "id": 1038, "title": "Me Before You", "author": "Jojo Moyes", "genre": "romance", "rating": 4.25, "year": 2012, "cover": "https://covers.openlibrary.org/b/isbn/9780670026609-L.jpg", "description": "A young woman forms an unlikely bond with the quadriplegic man she is hired to care for.", "mood": ["romantic", "thoughtful"] },
+            { "id": 1039, "title": "Jane Eyre", "author": "Charlotte Brontë", "genre": "romance", "rating": 4.14, "year": 1847, "cover": "https://covers.openlibrary.org/b/isbn/9780141441146-L.jpg", "description": "A classic gothic romance about an orphaned governess who falls in love with her brooding employer.", "mood": ["romantic", "mysterious", "thoughtful"] },
+            { "id": 1040, "title": "The Song of Achilles", "author": "Madeline Miller", "genre": "romance", "rating": 4.37, "year": 2011, "cover": "https://covers.openlibrary.org/b/isbn/9780062060617-L.jpg", "description": "A retelling of the Trojan War focusing on the deep, romantic relationship between Achilles and Patroclus.", "mood": ["romantic", "thoughtful", "adventurous"] },
+            { "id": 1041, "title": "The Seven Husbands of Evelyn Hugo", "author": "Taylor Jenkins Reid", "genre": "romance", "rating": 4.45, "year": 2017, "cover": "https://covers.openlibrary.org/b/isbn/9781501161933-L.jpg", "description": "A reclusive Old Hollywood movie icon decides to give a final interview, revealing shocking secrets.", "mood": ["romantic", "mysterious", "thoughtful"] },
+            { "id": 1042, "title": "Get a Life, Chloe Brown", "author": "Talia Hibbert", "genre": "romance", "rating": 3.96, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9780062941209-L.jpg", "description": "A chronically ill woman creates a bucket list to 'get a life' and enlists her rebellious neighbor to help.", "mood": ["romantic", "happy", "cozy"] },
+
+            // 1 for "escape"
+            { "id": 1043, "title": "Circe", "author": "Madeline Miller", "genre": "fantasy", "rating": 4.26, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9780316556347-L.jpg", "description": "A retelling of the Greek goddess Circe's story, from her immortal childhood to her exile on a deserted island.", "mood": ["escape", "thoughtful", "inspiring", "fantasy"] },
+
+            // 15 for "cozy"
+            { "id": 1044, "title": "The House in the Cerulean Sea", "author": "T.J. Klune", "genre": "fantasy", "rating": 4.43, "year": 2020, "cover": "https://covers.openlibrary.org/b/isbn/9781250217288-L.jpg", "description": "A magical social worker is sent to an orphanage for 'dangerous' magical children, finding love and family.", "mood": ["cozy", "happy", "inspiring", "romantic"] },
+            { "id": 1045, "title": "Anne of Green Gables", "author": "L.M. Montgomery", "genre": "romance", "rating": 4.27, "year": 1908, "cover": "https://covers.openlibrary.org/b/isbn/9780141321028-L.jpg", "description": "An imaginative and talkative orphan girl is mistakenly sent to live with an elderly brother and sister.", "mood": ["cozy", "happy", "inspiring"] },
+            { "id": 1046, "title": "The No. 1 Ladies' Detective Agency", "author": "Alexander McCall Smith", "genre": "mystery", "rating": 3.89, "year": 1998, "cover": "https://covers.openlibrary.org/b/isbn/9780375727894-L.jpg", "description": "The gentle mysteries of Mma Ramotswe, the first female private detective in Botswana.", "mood": ["cozy", "mysterious", "happy"] },
+            { "id": 1047, "title": "Still Life", "author": "Louise Penny", "genre": "mystery", "rating": 3.96, "year": 2005, "cover": "https://covers.openlibrary.org/b/isbn/9780312541480-L.jpg", "description": "Chief Inspector Armand Gamache investigates a suspicious death in the seemingly idyllic village of Three Pines.", "mood": ["cozy", "mysterious", "thoughtful"] },
+            { "id": 1048, "title": "The Guernsey Literary and Potato Peel Pie Society", "author": "Mary Ann Shaffer & Annie Barrows", "genre": "history", "rating": 4.17, "year": 2008, "cover": "https://covers.openlibrary.org/b/isbn/9780385340991-L.jpg", "description": "A writer forms a bond with the residents of Guernsey Island through letters about their experiences during WWII.", "mood": ["cozy", "romantic", "thoughtful", "history"] },
+            { "id": 1049, "title": "Legends & Lattes", "author": "Travis Baldree", "genre": "fantasy", "rating": 4.13, "year": 2022, "cover": "https://covers.openlibrary.org/b/isbn/9781250886088-L.jpg", "description": "An orc barbarian hangs up her sword to open the first-ever coffee shop in a fantasy city.", "mood": ["cozy", "happy", "escape"] },
+            { "id": 1050, "title": "Little Women", "author": "Louisa May Alcott", "genre": "romance", "rating": 4.11, "year": 1868, "cover": "https://covers.openlibrary.org/b/isbn/9780147514011-L.jpg", "description": "The story of four sisters—Meg, Jo, Beth, and Amy—growing up in Civil War-era New England.", "mood": ["cozy", "thoughtful", "inspiring"] },
+            { "id": 1051, "title": "The Thursday Murder Club", "author": "Richard Osman", "genre": "mystery", "rating": 3.93, "year": 2020, "cover": "https://covers.openlibrary.org/b/isbn/9780241988268-L.jpg", "description": "Four friends in a retirement village meet weekly to discuss unsolved crimes, until a real one lands on their doorstep.", "mood": ["cozy", "mysterious", "happy"] },
+            { "id": 1052, "title": "The Hobbit", "author": "J.R.R. Tolkien", "genre": "fantasy", "rating": 4.28, "year": 1937, "cover": "https://covers.openlibrary.org/b/isbn/9780618260300-L.jpg", "description": "A comfortable hobbit, Bilbo Baggins, is swept into an epic quest with a band of dwarves to reclaim their mountain home.", "mood": ["cozy", "adventurous", "escape"] },
+            { "id": 1053, "title": "Howl's Moving Castle", "author": "Diana Wynne Jones", "genre": "fantasy", "rating": 4.29, "year": 1986, "cover": "https://covers.openlibrary.org/b/isbn/9780061478789-L.jpg", "description": "A young woman cursed with an old body finds refuge working as a cleaning lady for the notorious Wizard Howl.", "mood": ["cozy", "escape", "romantic", "adventurous"] },
+            { "id": 1054, "title": "The Long Way to a Small, Angry Planet", "author": "Becky Chambers", "genre": "science-fiction", "rating": 4.17, "year": 2014, "cover": "https://covers.openlibrary.org/b/isbn/9780062444134-L.jpg", "description": "A found-family space opera about the diverse crew of a tunneling ship on a long-haul job.", "mood": ["cozy", "escape", "adventurous", "thoughtful"] },
+            { "id": 1055, "title": "All Creatures Great and Small", "author": "James Herriot", "genre": "biography", "rating": 4.45, "year": 1972, "cover": "https://covers.openlibrary.org/b/isbn/9780312020305-L.jpg", "description": "The heartwarming true story of a young veterinarian's life and work in the 1930s Yorkshire Dales.", "mood": ["cozy", "happy", "inspiring"] },
+            { "id": 1056, "title": "A Psalm for the Wild-Built", "author": "Becky Chambers", "genre": "science-fiction", "rating": 4.14, "year": 2021, "cover": "https://covers.openlibrary.org/b/isbn/9781250236210-L.jpg", "description": "In a future utopia, a tea monk meets the first robot to emerge from the wilderness in centuries.", "mood": ["cozy", "thoughtful", "inspiring", "escape"] },
+            { "id": 1057, "title": "Evvie Drake Starts Over", "author": "Linda Holmes", "genre": "romance", "rating": 3.90, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9780525619246-L.jpg", "description": "A young widow and a former baseball star with the 'yips' become unlikely roommates in a small Maine town.", "mood": ["cozy", "romantic", "happy"] },
+            { "id": 1058, "title": "Chocolat", "author": "Joanne Harris", "genre": "fantasy", "rating": 4.04, "year": 1999, "cover": "https://covers.openlibrary.org/b/isbn/9780140282039-L.jpg", "description": "A mysterious woman and her daughter arrive in a conservative French village and open a magical chocolate shop.", "mood": ["cozy", "escape", "romantic"] }
+            // --- END OF 39 NEW BOOKS ---
+        ];
+
+        // As requested, here is a curated list of "Trending Books"
+        // This list will be used exclusively for the 'Trending' tab.
+        const TRENDING_BOOKS_DATA = [
+            { "id": 507, "title": "Project Hail Mary", "author": "Andy Weir", "genre": "science-fiction", "rating": 4.52, "year": 2021, "cover": "https://covers.openlibrary.org/b/isbn/9780593135204-L.jpg", "description": "A lone astronaut must save Earth from an extinction-level threat.", "mood": ["adventurous", "inspiring", "happy"] },
+            { "id": 800, "title": "Atomic Habits", "author": "James Clear", "genre": "self-help", "rating": 4.37, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9780735211292-L.jpg", "description": "A guide to building good habits and breaking bad ones.", "mood": ["inspiring"] },
+            { "id": 701, "title": "Educated", "author": "Tara Westover", "genre": "biography", "rating": 4.49, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9780399590504-L.jpg", "description": "A woman's quest for knowledge despite growing up in an isolated survivalist family.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 78, "title": "It Ends with Us", "author": "Colleen Hoover", "genre": "romance", "rating": 4.29, "year": 2016, "cover": "https://covers.openlibrary.org/b/isbn/9781501110368-L.jpg", "description": "A powerful story about love, strength, and making difficult choices.", "mood": ["romantic", "thoughtful"] },
+            { "id": 404, "title": "The Silent Patient", "author": "Alex Michaelides", "genre": "mystery", "rating": 4.07, "year": 2019, "cover": "https://covers.openlibrary.org/b/isbn/9781250301697-L.jpg", "description": "A woman shoots her husband and then never speaks another word.", "mood": ["mysterious"] },
+            { "id": 306, "title": "From Blood and Ash", "author": "Jennifer L. Armentrout", "genre": "romance", "rating": 4.28, "year": 2020, "cover": "https://covers.openlibrary.org/b/isbn/9781952457005-L.jpg", "description": "A maiden's duty, a forbidden love, and a dangerous destiny collide.", "mood": ["romantic", "adventurous", "escape"] },
+            { "id": 700, "title": "Becoming", "author": "Michelle Obama", "genre": "biography", "rating": 4.53, "year": 2018, "cover": "https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg", "description": "The memoir of the former First Lady of the United States.", "mood": ["inspiring", "thoughtful"] },
+            { "id": 202, "title": "The Way of Kings", "author": "Brandon Sanderson", "genre": "fantasy", "rating": 4.65, "year": 2010, "cover": "https://covers.openlibrary.org/b/isbn/9780765326355-L.jpg", "description": "Epic fantasy featuring knights radiant and magical swords called shardblades.", "mood": ["adventurous", "escape", "inspiring"] }
+        ];
+
+        let currentTab = 'discover';
+        let filteredBooks = [...BOOKS_DATA];
+        let selectedMood = null;
+        let wishlist = [];
+
+        (function () {
+            function initializeApp() {
+                setupEventListeners();
+                loadWishlist();
+                renderBooks(BOOKS_DATA);
+                setupTheme();
+            }
+
+            function loadWishlist() {
+                wishlist = [];
+            }
+
+            function saveWishlist() { }
+
+            function toggleWishlist(bookId, buttonElement) {
+                const bookIndex = wishlist.indexOf(bookId);
+                if (bookIndex > -1) {
+                    wishlist.splice(bookIndex, 1);
+                    buttonElement.classList.remove('saved');
+                    buttonElement.innerHTML = '<i class="fas fa-heart"></i> Save';
+                } else {
+                    wishlist.push(bookId);
+                    buttonElement.classList.add('saved');
+                    buttonElement.innerHTML = '<i class="fas fa-check"></i> Saved';
+                }
+                saveWishlist();
+            }
+
+            function openWishlistModal() {
+                const modalOverlay = document.getElementById('wishlistModalOverlay');
+                const wishlistBody = document.getElementById('wishlistBody');
+
+                if (wishlist.length === 0) {
+                    wishlistBody.innerHTML = '<div class="wishlist-empty"><i class="fas fa-heart-broken" style="font-size: 2rem; margin-bottom: 1rem;"></i><p>Your wishlist is empty.</p><p>Click the "Save" button on any book to add it here.</p></div>';
+                } else {
+                    // Now check ALL books (main + trending) when building wishlist
+                    const allBooks = [...BOOKS_DATA];
+                    const wishlistBooks = allBooks.filter(book => wishlist.includes(book.id));
+
+                    wishlistBody.innerHTML = `<div class="wishlist-grid">${wishlistBooks.map(book => `
+                            <div class="wishlist-item">
+                                <img src="${book.cover}" alt="${book.title}">
+                                <h5>${book.title}</h5>
+                            </div>
+                        `).join('')
+                        }</div>`;
+                }
+                modalOverlay.classList.add('active');
+            }
+
+            function closeWishlistModal() {
+                document.getElementById('wishlistModalOverlay').classList.remove('active');
+            }
+
+            // New functions to control the login modal
+            function openLoginModal() {
+                document.getElementById('loginModalOverlay').classList.add('active');
+            }
+
+            function closeLoginModal() {
+                document.getElementById('loginModalOverlay').classList.remove('active');
+            }
+
+
+            function setupTheme() {
+                const themeToggle = document.getElementById('theme-toggle');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                if (prefersDark) {
+                    document.documentElement.classList.add('dark');
+                    themeToggle.checked = true;
+                }
+
+                themeToggle.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                });
+            }
+
+            function setupEventListeners() {
+                document.getElementById('enterAppBtn').addEventListener('click', () => {
+                    const homePage = document.getElementById('homePage');
+                    const appContainer = document.getElementById('appContainer');
+
+                    homePage.style.opacity = '0';
+                    homePage.addEventListener('transitionend', () => {
+                        homePage.style.display = 'none';
+                        appContainer.style.display = 'block';
+                        setTimeout(() => {
+                            appContainer.style.opacity = '1';
+                        }, 10);
+                    }, { once: true });
+                });
+
+                document.querySelectorAll('.nav-tab').forEach(tab => tab.addEventListener('click', function () { switchTab(this.dataset.tab, this.dataset.section); }));
+                document.querySelectorAll('.mood-card').forEach(card => card.addEventListener('click', function () { selectMood(this.dataset.mood); }));
+                document.getElementById('genreFilter').addEventListener('change', applyFilters);
+                document.getElementById('ratingFilter').addEventListener('change', applyFilters);
+                document.getElementById('yearFilter').addEventListener('change', applyFilters);
+                document.getElementById('sortFilter').addEventListener('change', applyFilters);
+                document.getElementById('searchInput').addEventListener('input', handleSearch);
+                document.getElementById('chatSendBtn').addEventListener('click', sendChatMessage);
+                document.getElementById('chatInput').addEventListener('keypress', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); } });
+                document.getElementById('chatInput').addEventListener('input', function () { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 120) + 'px'; });
+
+                const profileAvatar = document.getElementById('profileAvatar');
+                const profileDropdown = document.getElementById('profileDropdown');
+                profileAvatar.addEventListener('click', () => {
+                    profileDropdown.classList.toggle('active');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!document.getElementById('userProfile').contains(e.target)) {
+                        profileDropdown.classList.remove('active');
+                    }
+                });
+
+                // Wishlist Modal Listeners
+                document.getElementById('wishlistBtn').addEventListener('click', openWishlistModal);
+                document.getElementById('closeWishlistBtn').addEventListener('click', closeWishlistModal);
+                document.getElementById('wishlistModalOverlay').addEventListener('click', (e) => {
+                    if (e.target.id === 'wishlistModalOverlay') {
+                        closeWishlistModal();
+                    }
+                });
+
+                // New Listeners for the Login Modal
+                document.getElementById('loginModalBtn').addEventListener('click', openLoginModal);
+                document.getElementById('closeLoginBtn').addEventListener('click', closeLoginModal);
+                document.getElementById('loginModalOverlay').addEventListener('click', (e) => {
+                    if (e.target.id === 'loginModalOverlay') {
+                        closeLoginModal();
+                    }
+                });
+
+                // Added a listener for the form submission
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault(); // This stops the page from reloading
+                    // You can add your account creation logic here
+                    alert('Account Created (demo)!'); // Simple feedback for now
+                    closeLoginModal(); // Close the modal after submission
+                });
+            }
+
+            function switchTab(tabName, section) {
+                currentTab = tabName;
+                document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                document.getElementById('booksFilters').style.display = (section === 'books' || section === 'trending' || section === 'advanced') ? 'block' : 'none';
+                document.getElementById('moodSection').classList.toggle('active', section === 'mood');
+                if (section === 'mood') {
+                    selectedMood = null;
+                    document.querySelectorAll('.mood-card').forEach(card => card.classList.remove('selected'));
+                }
+                applyFilters();
+            }
+
+            function selectMood(mood) {
+                selectedMood = mood;
+                document.querySelectorAll('.mood-card').forEach(card => card.classList.remove('selected'));
+                document.querySelector(`[data-mood="${mood}"]`).classList.add('selected');
+
+                // Need to call applyFilters here to re-filter based on the selected mood
+                applyFilters();
+            }
+
+            function filterBooksByMood(mood) {
+                // This function is now simplified as applyFilters handles all logic
+                applyFilters();
+            }
+
+            function applyFilters() {
+                let baseBookList;
+                if (currentTab === 'trending') {
+                    baseBookList = [...TRENDING_BOOKS_DATA];
+                } else {
+                    // For all other tabs, start with the full main list
+                    baseBookList = [...BOOKS_DATA];
+                }
+
+                let books = baseBookList;
+
+                // Apply mood filter *only* if the mood tab is active and a mood is selected
+                if (currentTab === 'mood' && selectedMood) {
+                    books = books.filter(book => book.mood && book.mood.includes(selectedMood));
+                }
+
+                const genre = document.getElementById('genreFilter').value;
+                if (genre) { books = books.filter(book => book.genre === genre); }
+                const rating = document.getElementById('ratingFilter').value;
+                if (rating) { books = books.filter(book => book.rating >= parseFloat(rating)); }
+                const year = document.getElementById('yearFilter').value;
+                if (year) { books = books.filter(book => book.year >= parseInt(year)); }
+                const sort = document.getElementById('sortFilter').value;
+                switch (sort) {
+                    case 'rating': books.sort((a, b) => b.rating - a.rating); break;
+                    case 'recent': books.sort((a, b) => b.year - a.year); break;
+                    case 'title': books.sort((a, b) => a.title.localeCompare(b.title)); break;
+                    case 'popular': books.sort((a, b) => b.rating * Math.random() - a.rating * Math.random()); break;
+                }
+                filteredBooks = books; // This is important for search to work
+                renderBooks(books);
+            }
+
+            function handleSearch() {
+                const query = document.getElementById('searchInput').value.toLowerCase();
+                if (!query) { applyFilters(); return; }
+                // 'filteredBooks' now correctly holds the list for the current tab/filter
+                const searchResults = filteredBooks.filter(book => book.title.toLowerCase().includes(query) || book.author.toLowerCase().includes(query) || book.genre.toLowerCase().includes(query) || (book.description && book.description.toLowerCase().includes(query)));
+                renderBooks(searchResults);
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) { entry.target.style.opacity = '1'; entry.target.style.transform = 'translateY(0)'; }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            function renderBooks(books) {
+                const grid = document.getElementById('booksGrid');
+                if (books.length === 0) { grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;"><i class="fas fa-book-open" style="font-size: 4rem; color: var(--text-light); margin-bottom: 16px;"></i><h3 style="color: var(--text-medium); margin-bottom: 8px;">No books found</h3><p style="color: var(--text-light);">Try adjusting your filters or search terms</p></div>`; return; }
+                grid.innerHTML = books.map(book => {
+                    const isSaved = wishlist.includes(book.id);
+                    return `
+                        <div class="book-card" data-book-id="${book.id}">
+                            <div class="book-cover">
+                                <img src="${book.cover}" alt="${book.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="book-cover-fallback" style="display: none;"><i class="fas fa-book"></i><span>${book.title}</span></div>
+                            </div>
+                            <div class="book-info">
+                                <h3 class="book-title">${book.title}</h3>
+                                <p class="book-author">by ${book.author}</p>
+                                <div class="book-rating">
+                                    <div class="rating-stars">${generateStars(book.rating)}</div>
+                                    <span class="rating-text">${book.rating} • ${book.year}</span>
+                                </div>
+                                <div class="book-actions">
+                                    <button class="btn btn-primary" onclick="window.showBookDetails(event, ${book.id})"><i class="fas fa-info-circle"></i> Details</button>
+                                    <button class="btn btn-secondary ${isSaved ? 'saved' : ''}" onclick="window.addToWishlist(event, ${book.id})">
+                                        <i class="fas ${isSaved ? 'fa-check' : 'fa-heart'}"></i> ${isSaved ? 'Saved' : 'Save'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `}).join('');
+                document.querySelectorAll('.book-card').forEach(card => {
+                    observer.unobserve(card);
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    observer.observe(card);
+                });
+            }
+
+            function generateStars(rating) {
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 >= 0.5;
+                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                let stars = '';
+                for (let i = 0; i < fullStars; i++) stars += '<i class="fas fa-star"></i>';
+                if (hasHalfStar) stars += '<i class="fas fa-star-half-alt"></i>';
+                for (let i = 0; i < emptyStars; i++) stars += '<i class="far fa-star"></i>';
+                return stars;
+            }
+
+            function closeAllPopovers() {
+                document.querySelectorAll('.book-popover').forEach(pop => pop.remove());
+            }
+
+            window.showBookDetails = function (event, bookId) {
+                event.stopPropagation();
+                closeAllPopovers();
+
+                // Now check ALL books (main + trending)
+                const allBooks = [...BOOKS_DATA];
+                const book = allBooks.find(b => b.id === bookId);
+                if (!book) return;
+
+                const button = event.currentTarget;
+                const rect = button.getBoundingClientRect();
+
+                const popover = document.createElement('div');
+                popover.className = 'book-popover';
+                popover.innerHTML = `<button class="popover-close" onclick="this.parentElement.remove()">&times;</button><h4>${book.title}</h4><p><strong>Author:</strong> ${book.author}</p><p><strong>Rating:</strong> ${book.rating}/5 (${book.genre})</p><p>${book.description}</p>`;
+                document.body.appendChild(popover);
+
+                const popoverRect = popover.getBoundingClientRect();
+                popover.style.top = `${rect.top - popoverRect.height - 10}px`;
+                popover.style.left = `${rect.left + (rect.width / 2) - (popoverRect.width / 2)}px`;
+                setTimeout(() => popover.classList.add('active'), 10);
+
+                const closeHandler = (e) => { if (!popover.contains(e.target)) { popover.remove(); document.removeEventListener('click', closeHandler); document.removeEventListener('keydown', keydownHandler); } };
+                const keydownHandler = (e) => { if (e.key === 'Escape') { popover.remove(); document.removeEventListener('click', closeHandler); document.removeEventListener('keydown', keydownHandler); } };
+                setTimeout(() => { document.addEventListener('click', closeHandler); document.addEventListener('keydown', keydownHandler); }, 100);
+            }
+
+            window.addToWishlist = function (event, bookId) {
+                event.stopPropagation();
+                toggleWishlist(bookId, event.currentTarget);
+            }
+
+            window.sendQuickMessage = function (message) {
+                document.getElementById('chatInput').value = message;
+                sendChatMessage();
+            }
+
+            function sendChatMessage() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                if (!message) return;
+                addChatMessage('user', message);
+                input.value = '';
+                input.style.height = 'auto';
+                showTypingIndicator();
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const response = generateAIResponse(message);
+                    addChatMessage('bot', response);
+                }, 1500 + Math.random() * 1000);
+            }
+
+            function addChatMessage(type, text) {
+                const messagesContainer = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                const avatar = type === 'bot' ? '🤖' : '👤';
+                messageDiv.innerHTML = `<div class="message-avatar">${avatar}</div><div class="message-bubble">${text}</div>`;
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function showTypingIndicator() {
+                const messagesContainer = document.getElementById('chatMessages');
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot';
+                typingDiv.id = 'typingIndicator';
+                typingDiv.innerHTML = `<div class="message-avatar">🤖</div><div class="message-bubble"><div class="loading"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div></div>`;
+                messagesContainer.appendChild(typingDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) { typingIndicator.remove(); }
+            }
+
+            // Chatbot AI Response Logic
+            function generateAIResponse(userMessage) {
+                const message = userMessage.toLowerCase();
+                const mentionedBook = findMentionedBook(message);
+
+                if (mentionedBook) {
+                    return generateSimilarBookRecommendations(mentionedBook, message);
+                }
+
+                const likedPatterns = ['i liked', 'i loved', 'i enjoyed', 'similar to', 'like', 'loved', 'enjoyed'];
+                const hasLikedPattern = likedPatterns.some(pattern => message.includes(pattern));
+
+                if (hasLikedPattern) {
+                    const extractedBook = findMentionedBook(message);
+                    if (extractedBook) {
+                        return generateSimilarBookRecommendations(extractedBook, message);
+                    } else {
+                        return "I'd love to help! Could you tell me the specific title of a book you enjoyed? For example, 'I loved Harry Potter' or 'Recommend books like Dune'.";
+                    }
+                }
+
+                if (message.includes('fantasy')) {
+                    const fantasyBooks = BOOKS_DATA.filter(b => b.genre.toLowerCase() === 'fantasy').sort(() => 0.5 - Math.random()).slice(0, 2);
+                    return `Great choice! You might enjoy "${fantasyBooks[0].title}" by ${fantasyBooks[0].author} or "${fantasyBooks[1].title}" by ${fantasyBooks[1].author}.`;
+                }
+                if (message.includes('relax')) {
+                    const cozyBooks = BOOKS_DATA.filter(b => b.mood && b.mood.includes('cozy')).sort(() => 0.5 - Math.random()).slice(0, 2);
+                    return `For a relaxing read, I suggest "${cozyBooks[0].title}" or "${cozyBooks[1].title}". Enjoy!`;
+                }
+                if (message.includes('popular')) {
+                    const popularBooks = [...BOOKS_DATA].sort((a, b) => b.year - a.year).slice(0, 2);
+                    return `Some popular recent books are "${popularBooks[0].title}" and "${popularBooks[1].title}".`;
+                }
+                if (message.includes('thank')) {
+                    return "You're welcome! Let me know if you need more recommendations.";
+                }
+                if (message.includes('hello') || message.includes('hi')) {
+                    return "Hello! How can I help you find a book today? Tell me about a book you loved, and I'll recommend similar ones!";
+                }
+
+                const randomBook = BOOKS_DATA[Math.floor(Math.random() * BOOKS_DATA.length)];
+                return `I'm not sure about that, but have you considered reading "${randomBook.title}" by ${randomBook.author}? Or tell me about a book you've enjoyed, and I can find similar ones!`;
+            }
+
+            function findMentionedBook(message) {
+                const lowerMessage = message.toLowerCase();
+                const allBooks = [...BOOKS_DATA]; // Check all books
+
+                for (let book of allBooks) {
+                    const titleLower = book.title.toLowerCase();
+                    const authorLower = book.author.toLowerCase();
+
+                    if (lowerMessage.includes(titleLower)) {
+                        return book;
+                    }
+
+                    const titleWords = titleLower.split(' ');
+                    if (titleWords.length >= 2) {
+                        const mainTitle = titleWords.slice(0, Math.min(3, titleWords.length)).join(' ');
+                        if (mainTitle.length > 5 && lowerMessage.includes(mainTitle)) {
+                            return book;
+                        }
+                    }
+
+                    const authorLastName = authorLower.split(' ').pop();
+                    if (lowerMessage.includes(authorLastName) && titleWords.some(word => word.length > 3 && lowerMessage.includes(word))) {
+                        return book;
+                    }
+                }
+
+                return null;
+            }
+
+            function generateSimilarBookRecommendations(likedBook, originalMessage) {
+                const allBooks = [...BOOKS_DATA];
+                let similarBooks = allBooks.filter(book =>
+                    book.id !== likedBook.id &&
+                    book.genre === likedBook.genre
+                );
+
+                // Remove duplicates if any
+                similarBooks = [...new Map(similarBooks.map(item => [item['id'], item])).values()];
+
+                if (likedBook.mood && likedBook.mood.length > 0) {
+                    similarBooks = similarBooks.map(book => {
+                        let score = 10; // Start with genre match
+                        if (book.mood) {
+                            const matchingMoods = book.mood.filter(mood => likedBook.mood.includes(mood)).length;
+                            score += matchingMoods * 5;
+                        }
+                        const ratingDiff = Math.abs(book.rating - likedBook.rating);
+                        if (ratingDiff < 0.3) score += 3;
+                        else if (ratingDiff < 0.5) score += 2;
+                        else if (ratingDiff < 1.0) score += 1;
+
+                        return { book, score };
+                    }).sort((a, b) => b.score - a.score).map(item => item.book);
+                }
+
+                const recommendations = similarBooks.slice(0, 3);
+
+                if (recommendations.length === 0) {
+                    return `"${likedBook.title}" is a great book! Unfortunately, I don't have many similar titles in my database right now. Would you like recommendations from the ${likedBook.genre} genre in general?`;
+                }
+
+                if (recommendations.length === 1) {
+                    return `Since you enjoyed "${likedBook.title}", I think you'll love "${recommendations[0].title}" by ${recommendations[0].author}. It's also ${likedBook.genre} with a ${recommendations[0].rating} rating!`;
+                }
+
+                if (recommendations.length === 2) {
+                    return `Great taste! Since you liked "${likedBook.title}", I recommend: "${recommendations[0].title}" by ${recommendations[0].author} and "${recommendations[1].title}" by ${recommendations[1].author}. Both are ${likedBook.genre} books you'll enjoy!`;
+                }
+
+                return `Excellent choice! Since you enjoyed "${likedBook.title}", here are my top picks for you:
+
+			📚 "${recommendations[0].title}" by ${recommendations[0].author} (${recommendations[0].rating}⭐)
+			📚 "${recommendations[1].title}" by ${recommendations[1].author} (${recommendations[1].rating}⭐)
+			📚 "${recommendations[2].title}" by ${recommendations[2].author} (${recommendations[2].rating}⭐)
+
+			All are ${likedBook.genre} books with similar vibes!`;
+            }
+
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        })();
+    </script>
+</body>
+
+</html>
